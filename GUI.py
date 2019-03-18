@@ -94,9 +94,7 @@ class my_GUI(object):
         self.logText = Text(self.tk, width=55, height=8)
         self.canvas.create_window(225, 495, window=self.logText)
 
-        self.img_open = Image.open(self.filename)
-        self.img_open = self.resize(300, 300, self.img_open)
-        self.img_jpg = ImageTk.PhotoImage(self.img_open)
+
 
     '''def Start_serial_launcher():
         th=Thread(target=Start_serial,args=())
@@ -132,6 +130,9 @@ class my_GUI(object):
             print(self.filename)
             # 用canvas.create_iamge显示图片的话好像会被放到底层去
 
+            self.img_open = Image.open(self.filename)
+            self.img_open = self.resize(300, 200, self.img_open)
+            self.img_jpg = ImageTk.PhotoImage(self.img_open)
             self.label_img = Label(self.tk, image=self.img_jpg)
             self.canvas.create_window(225, 290, window=self.label_img)
         except:
