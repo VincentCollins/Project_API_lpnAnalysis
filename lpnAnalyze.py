@@ -11,13 +11,13 @@ class API_lpn(object):
         self.request.add_header('Content-Type', 'application/json; charset=UTF-8')
 
     # 测试函数，直接读取保存好的json文件
-    def connect(self,adress):
+    def connect2(self,adress):
         with open("./data.json","r") as load_f:
             self.queryResult=json.load(load_f)
         print(self.queryResult["words_result"])
 
     # 正式函数，联网调用api
-    def connect2(self, adress):
+    def connect(self, adress):
         self.response = urllib.request.urlopen(self.request)
         self.content = self.response.read()
         '''if (self.content):
@@ -46,11 +46,12 @@ class API_lpn(object):
             print(self.content2)
         #content2是bytes类型
         self.queryResult = json.loads(self.content2)
-        print(self.queryResult["words_result"])
-        jsonData = json.dumps(self.queryResult)
+        #print(self.queryResult["words_result"])
+        '''jsonData = json.dumps(self.queryResult)
         fileObject = open('data.json', 'w')
         fileObject.write(jsonData)
         fileObject.close()
+        '''
 
 
 

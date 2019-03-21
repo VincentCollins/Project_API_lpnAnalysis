@@ -11,17 +11,17 @@ class API_illegality(object):
         self.Params = {"key": "4c5e32ce5726136069ece29f59b989da", "city": "beijing", "type": "1"}
 
     #测试函数，直接读取保存好的json文件
-    def query(self, city, type):
+    def query2(self, city, type):
         with open("./data_R.json",'r')as load_f:
             self.res=json.load(load_f)
         self.queryResult=self.res["result"]
-        print(self.queryResult)
+        #print(self.queryResult)
 
     #正式函数，联网调用api
-    def query2(self, city, type):
+    def query(self, city, type):
         #print("your city:",city,"your type:",type)
-        self.Params[city]=city
-        self.Params[type]=type
+        self.Params["city"]=city
+        self.Params["type"]=type
         self.params = urlencode(self.Params)
         self.url = 'http://v.juhe.cn/xianxing/index?%s' % self.params
 

@@ -6,7 +6,7 @@ import tkinter.filedialog
 import tkinter.ttk as ttk
 from PIL import Image, ImageTk
 from datetime import *
-
+from collections import Iterable
 from lpnAnalysis.lpnAnalyze import *
 from lpnAnalysis.lpnRestrictionInves import *
 
@@ -17,7 +17,7 @@ class my_GUI(object):
         self.api_lpn=API_lpn()
         self.api_ill=API_illegality()
         #关键变量
-        self.filename = ''
+        self.filename = 'car.jpg'
         # 定义参数字典
         # dict_COM没有设置必要，本来就需要用字符串赋值
         self.dict_Day = {"Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7}
@@ -101,12 +101,13 @@ class my_GUI(object):
         self.logText = Text(self.tk, width=55, height=8)
         self.canvas.create_window(225, 495, window=self.logText)
 
-        showinfo("NOTE","It is my honor to have this APP used by you guys!\n"
+        '''showinfo("NOTE","It is my honor to have this APP used by you guys!\n"
                     "Select an image file, set the two parameters,\n"
                     "And you can:\n"
                     "1.Analyze the license number in the picture\n"
                     "2.Analyze whether the car is illegally driven\n"
                     "(specifically,with a restricted rear number)")
+        '''
 
 
     '''def Start_serial_launcher():
@@ -121,10 +122,11 @@ class my_GUI(object):
         try:
             if self.Day.get()!='today':
                 print((self.dict_Day[self.Day.get()]+8-self.dict_Day[self.myday])%7)
-                self.api_ill.query(self.City.get(), (self.dict_Day[self.Day]+8-self.dict_Day[self.myday])%7)
+                self.api_ill.query(self.City.get(), (self.dict_Day[self.Day.get()]+8-self.dict_Day[self.myday])%7)
+                print('ok')
             else:
                 self.api_ill.query(self.City.get(), 1)
-            self.logText.insert(INSERT, 'Rear number restriction inquiry:\n '+"city:"+self.City.get()+"\n")
+            self.logText.insert(INSERT, 'Rear number restriction inquiry:\n'+"city:"+self.City.get()+"\n")
             self.logText.see(END)
             if self.Day.get()=='today':
                 self.logText.insert(INSERT, "Day:"+self.myday+'\n')
@@ -132,18 +134,26 @@ class my_GUI(object):
             else:
                 self.logText.insert(INSERT, "Day:" + self.Day.get()+'\n')
                 self.logText.see(END)
-            self.logText.insert(INSERT, "Restricted number"+self.api_ill.queryResult['xxweihao']+'\n\n')
+            print(self.api_ill.queryResult)
+            self.logText.insert(INSERT, "Restricted number: ")
+            for n in self.api_ill.queryResult["xxweihao"]:
+                self.logText.insert(INSERT, str(n)+' ')
+
+            self.logText.insert(INSERT, "\n\n")
             self.logText.see(END)
             self.logText.insert(INSERT, "Illegality detection:\n")
             self.logText.see(END)
 
-            for n, value in enumerate(self.api_lpn.queryResult['words_result']):
-                self.logText.insert(INSERT, "Plate "+value['number'])
-                if value["number"][-1] in self.api_ill.queryResult['xxweihao']:
-                    self.logText.insert(INSERT, "illegal")
+            for value in self.api_lpn.queryResult['words_result']:
+                self.logText.insert(INSERT, "Plate "+value['number']+':')
+                if int(value["number"][-1]) in self.api_ill.queryResult['xxweihao']:
+                    self.logText.insert(INSERT, " illegal\n")
                 else:
-                    self.logText.insert(INSERT, "legal")
+                    self.logText.insert(INSERT, " legal\n")
+                self.logText.insert(INSERT, "\n")
                 self.logText.see(END)
+
+
 
 
         except:
@@ -165,12 +175,13 @@ class my_GUI(object):
 
                     print(self.api_lpn.queryResult["words_result"])
                 else:
-                    for n,value in enumerate(self.api_lpn.queryResult['words_result']):
-                        self.logText.insert(INSERT, n+': ' + value['number']+'\n\n')
+
+                    for n in self.api_lpn.queryResult['words_result']:
+                        print(n['number'])
+                        self.logText.insert(INSERT, n['number']+'\n')
                         self.logText.see(END)
-
-
-
+                    self.logText.insert(INSERT, '\n')
+                    self.logText.see(END)
 
             #调用self.api_lpn.content2中的数据
         except:
