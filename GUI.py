@@ -5,12 +5,19 @@ from tkinter.messagebox import *
 import tkinter.filedialog
 import tkinter.ttk as ttk
 from PIL import Image, ImageTk
+from datetime import *
+
+from lpnAnalysis.lpnAnalyze import *
+from lpnAnalysis.lpnRestrictionInves import *
 
 
 class my_GUI(object):
     def __init__(self):
+        self.myday=datetime.now().strftime('%A')
+        self.api_lpn=API_lpn()
+        self.api_ill=API_illegality()
         #关键变量
-        self.filename = 'car.jpg'
+        self.filename = ''
         # 定义参数字典
         # dict_COM没有设置必要，本来就需要用字符串赋值
         self.dict_Day = {"Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7}
@@ -41,7 +48,7 @@ class my_GUI(object):
 
         self.Day = StringVar()#用来盛放从下拉栏中选择的字符串值
         self.day = ttk.Combobox(self.tk, width=7, textvariable=self.Day,state='readonly')
-        self.day['values'] = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")#下拉栏的显示内容
+        self.day['values'] = ("today", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")#下拉栏的显示内容
         self.day.current(0)
 
         self.id11=self.canvas.create_window(165, 95,window=self.city)
@@ -59,14 +66,14 @@ class my_GUI(object):
         self.Switch_ill = StringVar()
         self.Switch_ill.set("Illegality Analysis")
         self.button41 = Button(self.tk, textvariable=self.Switch_ill, width=25,
-                               command=self.Start_illegalityAnalysis())  # button启动的函数不能接受参数，此时使用lambda，先计算函数结果，然后把结果强制重组为一个匿名简单函数
+                               command=self.Start_illegalityAnalysis)  # button启动的函数不能接受参数，此时使用lambda，先计算函数结果，然后把结果强制重组为一个匿名简单函数
         self.id41 = self.canvas.create_window(325, 35, window=self.button41)
 
         #车牌号分析开关
         self.Switch_lic = StringVar()
         self.Switch_lic.set('License Number Analysis')
         self.button61 = Button(self.tk, textvariable=self.Switch_lic, width=25,
-                               command=self.Start_licenseNumberAnalysis())  # button启动的函数不能接受参数，此时使用lambda，先计算函数结果，然后把结果强制重组为一个匿名简单函数
+                               command=self.Start_licenseNumberAnalysis)  # button启动的函数不能接受参数，此时使用lambda，先计算函数结果，然后把结果强制重组为一个匿名简单函数
         self.id61 = self.canvas.create_window(120, 35, window=self.button61)
 
         # 图片栏
@@ -94,6 +101,12 @@ class my_GUI(object):
         self.logText = Text(self.tk, width=55, height=8)
         self.canvas.create_window(225, 495, window=self.logText)
 
+        showinfo("NOTE","It is my honor to have this APP used by you guys!\n"
+                    "Select an image file, set the two parameters,\n"
+                    "And you can:\n"
+                    "1.Analyze the license number in the picture\n"
+                    "2.Analyze whether the car is illegally driven\n"
+                    "(specifically,with a restricted rear number)")
 
 
     '''def Start_serial_launcher():
@@ -102,14 +115,66 @@ class my_GUI(object):
         th.start()
     '''
     def Start_illegalityAnalysis(self):
+        if not self.filename:
+            showwarning("Warning", "Choose an image file first!")
+            return
         try:
-            pass
+            if self.Day.get()!='today':
+                print((self.dict_Day[self.Day.get()]+8-self.dict_Day[self.myday])%7)
+                self.api_ill.query(self.City.get(), (self.dict_Day[self.Day]+8-self.dict_Day[self.myday])%7)
+            else:
+                self.api_ill.query(self.City.get(), 1)
+            self.logText.insert(INSERT, 'Rear number restriction inquiry:\n '+"city:"+self.City.get()+"\n")
+            self.logText.see(END)
+            if self.Day.get()=='today':
+                self.logText.insert(INSERT, "Day:"+self.myday+'\n')
+                self.logText.see(END)
+            else:
+                self.logText.insert(INSERT, "Day:" + self.Day.get()+'\n')
+                self.logText.see(END)
+            self.logText.insert(INSERT, "Restricted number"+self.api_ill.queryResult['xxweihao']+'\n\n')
+            self.logText.see(END)
+            self.logText.insert(INSERT, "Illegality detection:\n")
+            self.logText.see(END)
+
+            for n, value in enumerate(self.api_lpn.queryResult['words_result']):
+                self.logText.insert(INSERT, "Plate "+value['number'])
+                if value["number"][-1] in self.api_ill.queryResult['xxweihao']:
+                    self.logText.insert(INSERT, "illegal")
+                else:
+                    self.logText.insert(INSERT, "legal")
+                self.logText.see(END)
+
+
         except:
             showwarning("错误！", "检查串口设置并重置总开关")
 
 
     def Start_licenseNumberAnalysis(self):
-        pass
+        try:
+            if not self.filename:
+                showwarning("Warning","Choose an image file first!")
+            #print('start')
+            else:
+                self.api_lpn.connect(self.filename)
+                self.logText.insert(INSERT,"license plate number analyzing result:\n")
+                self.logText.see(END)
+                if "error_code" in self.api_lpn.queryResult:
+                    self.logText.insert(INSERT, "No plates detected!\n\n")
+                    self.logText.see(END)
+
+                    print(self.api_lpn.queryResult["words_result"])
+                else:
+                    for n,value in enumerate(self.api_lpn.queryResult['words_result']):
+                        self.logText.insert(INSERT, n+': ' + value['number']+'\n\n')
+                        self.logText.see(END)
+
+
+
+
+            #调用self.api_lpn.content2中的数据
+        except:
+            pass
 
 
 
@@ -125,6 +190,8 @@ class my_GUI(object):
 
 
     def Start_selectingImage(self):
+
+
         try:
             self.filename=tkinter.filedialog.askopenfilename()
             print(self.filename)
@@ -135,6 +202,8 @@ class my_GUI(object):
             self.img_jpg = ImageTk.PhotoImage(self.img_open)
             self.label_img = Label(self.tk, image=self.img_jpg)
             self.canvas.create_window(225, 290, window=self.label_img)
+            self.logText.insert(INSERT,"You have selected file:" + self.filename + '\n\n')
+            self.logText.see(END)
         except:
             pass
 
@@ -142,8 +211,11 @@ class my_GUI(object):
 
     def Start_removingImage(self):
         try:
+            self.logText.insert(INSERT, "You have removed the latest image!\n\n")
+            self.logText.see(END)
             self.label111 = Label(self.tk, width=50, height=13, bg="whitesmoke")
             self.canvas.create_window(225, 290, window=self.label111)
+            self.filename=''
         except:
             pass
 
