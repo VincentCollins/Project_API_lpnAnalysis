@@ -4,13 +4,14 @@
 import urllib.request, json
 from urllib.parse import urlencode
 
-#available cities:beijign, guiyang, hangzhou, lanzhou, tianjin, chengdu, nanchang, changchun, haerbin, chongqing
-#type意义：1  今天 2 明天 3 后天(1~7)
+#这个类封装了“查询尾号”API所需的所有内容
 class API_illegality(object):
     def __init__(self):
         self.Params = {"key": "4c5e32ce5726136069ece29f59b989da", "city": "beijing", "type": "1"}
 
     #测试函数，直接读取保存好的json文件
+    # available cities:beijing, guiyang, hangzhou, lanzhou, tianjin, chengdu, nanchang, changchun, haerbin, chongqing
+    # type意义：1  今天 2 明天 3 后天(1~7)
     def query2(self, city, type):
         with open("./data_R.json",'r')as load_f:
             self.res=json.load(load_f)
@@ -18,8 +19,8 @@ class API_illegality(object):
         #print(self.queryResult)
 
     #正式函数，联网调用api
+    #query（城市，相对星期数），用来访问API以获取该城市某一天的限号情况
     def query(self, city, type):
-        #print("your city:",city,"your type:",type)
         self.Params["city"]=city
         self.Params["type"]=type
         self.params = urlencode(self.Params)
@@ -28,11 +29,15 @@ class API_illegality(object):
         self.wp = urllib.request.urlopen(self.url)
         self.content = self.wp.read()
         self.res = json.loads(self.content)
+
+        #测试代码，用户生成本地json文件，节约API访问限数
         '''jsonData = json.dumps(self.res)
         fileObject = open('data_R.json', 'w')
         fileObject.write(jsonData)
         fileObject.close()
         '''
+
+        #分析json中的关键信息是否合法，无论是否合法，都把信息存到queryResult变量中
         if self.res:
             self.error_code = self.res['error_code']
             if self.error_code == 0:
@@ -41,15 +46,11 @@ class API_illegality(object):
                 self.queryResult =False
         else:
             self.queryResult =False
-
+        # 若queryResult正确地存储了信息，就把限行尾号存到weihaos变量中
         if self.queryResult:
             if self.queryResult['isxianxing'] == 1:
                 self.weihaos = self.queryResult['xxweihao']
             else:
                 self.weihaos = ''
-            #print("城市：%s,日期：%s,%s" % (self.queryResult['city'], self.queryResult['date'], self.queryResult['week']))
-            #print("是否限行：%s,限行尾号:%s" % (self.queryResult['isxianxing'], self.weihaos))
-            # print queryResult
-            # print queryResult['date']
         else:
             print("查询失败")

@@ -3,6 +3,7 @@ import urllib.request,urllib.parse
 import base64
 import json
 
+#这个类封装了访问“汽车车牌号识别”API的所有内容
 class API_lpn(object):
     def __init__(self):
         # client_id 为官网获取的AK， client_secret 为官网获取的SK
@@ -20,9 +21,6 @@ class API_lpn(object):
     def connect(self, adress):
         self.response = urllib.request.urlopen(self.request)
         self.content = self.response.read()
-        '''if (self.content):
-            print(type(self.content))
-        '''
         self.content_str= str(self.content, encoding="utf-8")
         self.content_dir = eval(self.content_str)
         #eval函数把字符串转为字典
@@ -47,6 +45,8 @@ class API_lpn(object):
         #content2是bytes类型
         self.queryResult = json.loads(self.content2)
         #print(self.queryResult["words_result"])
+
+        #测试函数，用于把json文件存到本地，节约API的调用限数
         '''jsonData = json.dumps(self.queryResult)
         fileObject = open('data.json', 'w')
         fileObject.write(jsonData)
