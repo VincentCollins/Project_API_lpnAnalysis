@@ -149,20 +149,28 @@ class my_GUI(object):
                 self.log_print("Day:"+self.myday+'\n')
             else:
                 self.log_print("Day:" + self.Day.get()+'\n')
-            self.log_print("Restricted number: ")
-            for n in self.api_ill.queryResult["xxweihao"]:
-                self.log_print(str(n)+' ')
+            self.log_print("\nRestricted number: ")
+
+            if self.api_ill.queryResult["isxianxing"]:#如果这一天有限行的话
+                for n in self.api_ill.queryResult["xxweihao"]:
+                    self.log_print(str(n)+' ')
+            else:#这一天无限行
+                self.log_print("No restriction in this day")
 
             #根据API返回的尾号限行数据，判断刚才识别到的车牌号在用户指定的地点、时间是否违规
             self.log_print("\n\nIllegality detection:\n")
             #如果有多个车牌的话，依次显示判断结果
-            for value in self.api_lpn.queryResult['words_result']:
-                self.log_print("Plate "+value['number']+':')
-                if int(value["number"][-1]) in self.api_ill.queryResult['xxweihao']:
-                    self.log_print(" illegal\n")
-                else:
-                    self.log_print(" legal\n")
-            self.log_print('\n')
+
+            if self.api_ill.queryResult["isxianxing"]:#如果这一天有限行
+                for value in self.api_lpn.queryResult['words_result']:
+                    self.log_print("Plate "+value['number']+':')
+                    if int(value["number"][-1]) in self.api_ill.queryResult['xxweihao']:
+                        self.log_print(" illegal\n")
+                    else:
+                        self.log_print(" legal\n")
+                self.log_print('\n')
+            else:
+                self.log_print('No car is illegally driven\n')
         except:
             pass
 
