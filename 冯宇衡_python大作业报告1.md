@@ -45,13 +45,11 @@
 
 我设计的这个工具允许用户选择一张本地图片，然后程序访问两个网站的API，识别图中的车牌号码，并且判断相应车辆是否违规驾驶（基于用户选择的`City`和`Day`参数）
 
-<img src="https://github.com/VincentCollins/Project_API_lpnAnalysis/img_in_report/1.png"/>
+<img src="http://harukun.top/myfiles/1.png" style="width:260px ">
 
-<img src="https://github.com/Chaphlagical/WeChat-Robot/blob/master/image/1.jpg"/>
+
 
 本实验调用了两个API，一个是百度云只能提供的“图片中车牌号识别”的API，一个是智能聚合网站提供的“限行尾号查询”的API
-
-
 
 ### <a name="1.2">1.2 使用说明</a>
 
@@ -171,7 +169,9 @@ Start_removingImage(self) #按钮函数，用于撤销当前图片的选择
 
 * 为了正确地排版，只能先设计一个大概位置，然后运行显示，移动10px，再运行显示，再移动......如此往复
 
-* 为了保证美观，想给每一个栏目外围设计了一圈边框（如图），![1553692541155](C:\Users\Vincent Collins\AppData\Roaming\Typora\typora-user-images\1553692541155.png)
+* 为了保证美观，想给每一个栏目外围设计了一圈边框（如图），
+
+  <img src="http://harukun.top/myfiles/2.png" style="width:400px ">
 
   但是打死都做不出来，后来好不容易查到可以直接用label实现，又怎么也不能把栏目标题居中。最后是在相关函数的declaration里递归查找才找到了相应的参数设置方法
 
