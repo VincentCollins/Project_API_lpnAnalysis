@@ -7,11 +7,13 @@ from urllib.parse import urlencode
 #这个类封装了“查询尾号”API所需的所有内容
 class API_illegality(object):
     def __init__(self):
-        self.Params = {"key": "4c5e32ce5726136069ece29f59b989da", "city": "beijing", "type": "1"}
+        #读取文件中的密钥信息
+        with open("./key_data.json",'r')as load_f:
+            self.result=json.load(load_f)
+        self.Params = {"key": self.result['key'], "city": "beijing", "type": "1"}
 
     #测试函数，直接读取保存好的json文件
-    # available cities:beijing, guiyang, hangzhou, lanzhou, tianjin, chengdu, nanchang, changchun, haerbin, chongqing
-    # type意义：1  今天 2 明天 3 后天(1~7)
+    #type(取值范围：1~7)意义：1 今天  2 明天  3 后天...
     def query2(self, city, type):
         with open("./data_R.json",'r')as load_f:
             self.res=json.load(load_f)

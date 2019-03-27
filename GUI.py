@@ -10,7 +10,7 @@ from collections import Iterable
 from lpnAnalysis.lpnAnalyze import *
 from lpnAnalysis.lpnRestrictionInves import *
 
-#建立my_GUI类，代表了整个GUI
+#my_GUI类包含了GUI创建所需一切内容
 class my_GUI(object):
     def __init__(self):
         self.myday=datetime.now().strftime('%A')#获取时间
@@ -22,7 +22,6 @@ class my_GUI(object):
         #关键变量filename，用于存储用户选择的图片的路径
         self.filename = 'car.jpg'
 
-        # 定义参数字典
         self.dict_Day = {"Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7}
 
         #GUI初始化
@@ -36,7 +35,6 @@ class my_GUI(object):
         self.canvas.pack()
 
 
-        #先定义frame，避免覆盖
         self.label01 = LabelFrame(self.tk,height=60,width=420,text="Main Switch",labelanchor='n',bg="whitesmoke")
         self.id01=self.canvas.create_window(225,30,window=self.label01)#坐标是正中
         self.label00 = LabelFrame(self.tk,height=60,width=420,text="Parameter Setting",labelanchor='n',bg="whitesmoke")
@@ -111,7 +109,7 @@ class my_GUI(object):
                     "(specifically,with a restricted rear number)")
         '''
 
-    #起初使用多线程的代码
+    #使用多线程的代码
     '''def Start_serial_launcher():
         th=Thread(target=Start_serial,args=())
         th.setDaemon(TRUE)
@@ -125,21 +123,16 @@ class my_GUI(object):
 
     #开始进行违规驾驶分析：访问提供限号信息的API
     def Start_illegalityAnalysis(self):
-        #提示信息
+        #提示选择文件
         if not self.filename:
             showwarning("Warning", "Choose an image file first!")
             return
         try:
-            #由于API需要的星期数由1~7表示，同时1表示今天，2表示明天，以此类推，所以必须把静态的时间
-            #（GUI中选择的）转换为API需要的动态相对时间，需要进行一些运算
+            #API需要的星期数由1~7表示，同时1表示今天，2表示明天，以此类推，所以需要数字标号的换算
             if self.Day.get()!='today':
-                #我在GUI中提供了“today”这个选项
                 #query()在文件lpnRestrctionInves.py中的API_illegality类中定义
-                #query()函数用于直接访问API
-                #一个参数是城市，一个是相对星期数
-                print((self.dict_Day[self.Day.get()]+8-self.dict_Day[self.myday])%7)
+                #query()函数用于直接访问API，一个参数是城市，一个是相对星期数
                 self.api_ill.query(self.City.get(), (self.dict_Day[self.Day.get()]+8-self.dict_Day[self.myday])%7)
-                print('ok')
             else:
                 self.api_ill.query(self.City.get(), 1)
 
@@ -160,7 +153,6 @@ class my_GUI(object):
             #根据API返回的尾号限行数据，判断刚才识别到的车牌号在用户指定的地点、时间是否违规
             self.log_print("\n\nIllegality detection:\n")
             #如果有多个车牌的话，依次显示判断结果
-
             if self.api_ill.queryResult["isxianxing"]:#如果这一天有限行
                 for value in self.api_lpn.queryResult['words_result']:
                     self.log_print("Plate "+value['number']+':')
