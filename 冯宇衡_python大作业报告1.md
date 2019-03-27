@@ -45,7 +45,7 @@
 
 我设计的这个工具允许用户选择一张本地图片，然后程序访问两个网站的API，识别图中的车牌号码，并且判断相应车辆是否违规驾驶（基于用户选择的`City`和`Day`参数）
 
-<img src="https://github.com/VincentCollins/Project_API_lpnAnalysis/tree/master/img_in_report/1.png"/>
+<img src="https://github.com/VincentCollins/Project_API_lpnAnalysis/img_in_report/1.png"/>
 
 <img src="https://github.com/Chaphlagical/WeChat-Robot/blob/master/image/1.jpg"/>
 
