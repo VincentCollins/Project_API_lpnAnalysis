@@ -20,7 +20,7 @@ class my_GUI(object):
         self.api_ill=API_illegality()
 
         #关键变量filename，用于存储用户选择的图片的路径
-        self.filename = 'car.jpg'
+        self.filename = ''
 
         self.dict_Day = {"Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7}
 
